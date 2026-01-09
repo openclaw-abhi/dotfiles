@@ -43,7 +43,7 @@ zinit snippet OMZP::command-not-found
 
 # Load completions
 autoload -Uz compinit && compinit
-
+autoload zmv
 zinit cdreplay -q
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
@@ -54,6 +54,30 @@ bindkey -e
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 bindkey '^[w' kill-region
+bindkey ' ' magic-space
+bindkey -s '^Ga' 'git add .'
+bindkey -s '^Gc' 'git commit -m ""\C-b'
+
+# Hook for cd
+chpwd() {
+    emulate -L zsh
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        local env_root="${VIRTUAL_ENV:h}"
+        if [[ "$PWD" != "$env_root"* ]]; then
+            deactivate
+        fi
+    fi
+
+    local venv_name=".venv" 
+    if [[ -d "$venv_name" ]]; then
+        local absolute_venv_path="$PWD/$venv_name"
+        if [[ "$VIRTUAL_ENV" == "$absolute_venv_path" ]]; then
+            return
+        fi
+        
+        source "$venv_name/bin/activate"
+    fi
+}
 
 # History
 HISTSIZE=50
@@ -83,7 +107,14 @@ alias up='sudo pacman -Syu'
 alias ca='clear; :> ~/.zsh_history'
 alias path='print -l -- ${(s/:/)PATH}'
 alias zrc='nv ~/.zshrc; source ~/.zshrc'
+alias upy='curl -LsSf https://astral.sh/ruff/install.sh | sh; curl -LsSf https://astral.sh/uv/install.sh | sh'
 alias pyc='find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null && find . -type d -name .ruff_cache -exec rm -rf {} + 2>/dev/null'
+
+# Suffix Aliases
+alias -s py='nvim'
+alias -s env='bat'
+alias -s yml='bat'
+alias -s yaml='bat'
 
 # Shell integrations
 eval "$(fzf --zsh)"

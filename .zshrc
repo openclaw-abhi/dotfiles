@@ -107,6 +107,7 @@ alias up='sudo pacman -Syu'
 alias ca='clear; :> ~/.zsh_history'
 alias path='print -l -- ${(s/:/)PATH}'
 alias zrc='nv ~/.zshrc; source ~/.zshrc'
+alias dps='docker ps --format "table {{.Names}}\t{{.Status}}"'
 alias upy='curl -LsSf https://astral.sh/ruff/install.sh | sh; curl -LsSf https://astral.sh/uv/install.sh | sh'
 alias pyc='find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null && find . -type d -name .ruff_cache -exec rm -rf {} + 2>/dev/null'
 

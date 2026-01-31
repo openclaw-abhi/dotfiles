@@ -86,19 +86,23 @@ require("lazy").setup({
 	{
 		"neovim/nvim-lspconfig",
 		config = function()
-			vim.lsp.config("pylsp", {
-				settings = {
-					pylsp = {
-						plugins = {
-							pycodestyle = { enabled = false },
-							pyflakes = { enabled = false },
-							mccabe = { enabled = false },
-							ruff = { enabled = true, formatEnabled = false },
-						},
-					},
+			-- 1. Enables Inline Errors
+			vim.diagnostic.config({
+				virtual_text = {
+					prefix = "●",
 				},
+				signs = true,
+				underline = true,
+				update_in_insert = false,
 			})
-			vim.lsp.enable("pylsp")
+			-- 2. Ty setup
+			vim.lsp.config("ty", {
+				cmd = { "ty", "server" },
+				filetypes = { "python" },
+				root_markers = { "pyproject.toml", ".git" },
+			})
+			vim.lsp.enable("ty")
+
 			vim.api.nvim_create_autocmd("LspAttach", {
 				callback = function(args)
 					local opts = { buffer = args.buf }

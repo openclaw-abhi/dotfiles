@@ -126,7 +126,3 @@ eval "$(zoxide init --cmd cd zsh)"
 . "$HOME/.local/bin/env"
 eval "$(uv generate-shell-completion zsh)"
 
-# PATH modifications
-export PATH="$PATH:$HOME/.local/share/nvim/mason/bin"
-export PATH="$PATH:/home/abhinav/.opencode/bin"
-

@@ -97,9 +97,18 @@ require("lazy").setup({
 			})
 			-- 2. Ty setup
 			vim.lsp.config("ty", {
-				cmd = { "ty", "server" },
-				filetypes = { "python" },
-				root_markers = { "pyproject.toml", ".git" },
+				settings = {
+					ty = {
+						diagnosticMode = "workspace",
+						inlayHints = {
+							variableTypes = true,
+							callArgumentNames = true,
+						},
+						completions = {
+							autoImport = false,
+						},
+					},
+				},
 			})
 			vim.lsp.enable("ty")
 

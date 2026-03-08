@@ -36,10 +36,21 @@ zinit snippet OMZL::git.zsh
 zinit snippet OMZP::git
 zinit snippet OMZP::gh
 zinit snippet OMZP::sudo
-zinit snippet OMZP::archlinux
 zinit snippet OMZP::aws
 zinit snippet OMZP::python
 zinit snippet OMZP::command-not-found
+
+# OS-Specific Snippets & Aliases
+if grep -q "Arch" /etc/os-release 2>/dev/null; then
+    zinit snippet OMZP::archlinux
+    alias up='sudo pacman -Syu'
+elif grep -q "Ubuntu" /etc/os-release 2>/dev/null || grep -q "Debian" /etc/os-release 2>/dev/null; then
+    zinit snippet OMZP::ubuntu
+    alias up='sudo apt update; sudo apt upgrade -y'
+else
+    # Default fallback
+    alias up='echo "Unknown OS, update manually"'
+fi
 
 # Load completions
 autoload -Uz compinit && compinit
@@ -103,7 +114,6 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -alh $realpath'
 alias nv='nvim'
 alias c='clear'
 alias ls='eza -alh'
-alias up='sudo pacman -Syu'
 alias ca='clear; :> ~/.zsh_history'
 alias path='print -l -- ${(s/:/)PATH}'
 alias zrc='nv ~/.zshrc; source ~/.zshrc'
@@ -116,13 +126,29 @@ alias -s py='nvim'
 alias -s env='bat'
 alias -s yml='bat'
 alias -s yaml='bat'
-alias -s yaml='md'
+alias -s md='bat'
 
 # Shell integrations
-eval "$(fzf --zsh)"
+
+# FZF Configuration (Handle modern vs legacy versions)
+if command -v fzf >/dev/null; then
+  # Check if fzf supports the modern --zsh flag (version 0.48+)
+  if fzf --zsh >/dev/null 2>&1; then
+    eval "$(fzf --zsh)"
+  elif [ -f ~/.fzf.zsh ]; then
+    # Fallback for older fzf (Ubuntu/Debian) or manual install
+    source ~/.fzf.zsh
+  elif [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]; then
+     # Fallback for apt-installed fzf without ~/.fzf.zsh
+     source /usr/share/doc/fzf/examples/key-bindings.zsh
+     [ -f /usr/share/doc/fzf/examples/completion.zsh ] && source /usr/share/doc/fzf/examples/completion.zsh
+  fi
+fi
+
 eval "$(zoxide init --cmd cd zsh)"
 
 # UV Setup
-. "$HOME/.local/bin/env"
-eval "$(uv generate-shell-completion zsh)"
-
+if [ -f "$HOME/.local/bin/env" ]; then
+    . "$HOME/.local/bin/env"
+    eval "$(uv generate-shell-completion zsh)"
+fi
